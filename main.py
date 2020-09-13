@@ -1,15 +1,55 @@
 from flask import Flask, request, json
 import json as js
 import sys
-import telegram, settings, vk_api, tg_api
+import telegram
+import settings
+import vk_api
+import tg_api
 
 app = Flask(__name__)
 
 bot = telegram.Bot(token=settings.tg_token)
 
+# Рабочая директория
+homeDir = '/home/***/bot/'
+
+# Ответы бота
+Data = {}
+
+# Пользовательские данные (Текущая позиция в меню)
+vkData = {}
+tgData = {}
+
+def loadData():
+    global Data
+    Data = js.load(open(homeDir.join("Data.json"), 'r', encoding='utf-8'))
+
+def loadVK():
+    global vkData
+    vkData = js.load(open(homeDir.join("vkData.json"), 'r', encoding='utf-8'))
+    print("(VK) vkData загружена")
+
+
+def saveVK():
+    js.dump(vkData, open(homeDir.join("vkData.json"), 'w', encoding='utf-8'),
+            ensure_ascii=False, indent=4, separators=(',', ': '))
+
+
+def loadTG():
+    global tgData
+    tgData = js.load(open(homeDir.join("tgData.json"), 'r', encoding='utf-8'))
+    print("(TG) tgData загружена")
+
+
+def saveTG():
+    js.dump(tgData, open(homeDir.join("tgData.json"), 'w', encoding='utf-8'),
+            ensure_ascii=False, indent=4, separators=(',', ': '))
+
+
 @app.route('/')
 def main():
     return "Hello World"
+
 
 @app.route('/vk/', methods=["POST"])
 def vk_hook():
@@ -29,6 +69,7 @@ def vk_hook():
                 vk_api.sendMessage(user_id, "Привет!")
         except (KeyError, TypeError) as e:
             print("(VK) Error: ", e, sys.exc_info()[0], sys.exc_info()[1])
+
 
 @app.route('/tg/', methods=["POST"])
 def tg_hook():
