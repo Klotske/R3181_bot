@@ -33,3 +33,23 @@ def getKeyboard(keyboard):
     return str(keyboard.decode('utf-8'))
 
 # Место для разметки пользовательских меню
+
+menuMain = getKeyboard(
+    {
+        "one_time": False,
+        "buttons": [
+            [getButton("Актуальное", "positive")],
+            [getButton("Мои задания", "primary"), getButton("Настройки", "primary")],
+            [getButton("Полезные материалы", "primary")]
+        ]
+    }
+)
+
+back = getKeyboard(
+    {
+        "one_time": False,
+        "buttons": [
+            [getButton("Назад", "negative")]
+        ]
+    }
+)
