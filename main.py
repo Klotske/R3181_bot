@@ -66,11 +66,43 @@ def vk_hook():
             text = data['object']['message']['text']
             msg = text.lower()
             print("(VK) ID пользователя: ", user_id, "Сообщение: ", text)
-            if msg == "привет":
-                vk_api.sendMessage(user_id, "Привет!")
+            
+            if msg in ['начать', 'start', '/back', '/start']:
+                if str(user_id) in vkData.keys():
+                    vkData[str(user_id)]['step'] = 'menu'
+                    vk_api.sendMessage(user_id, Data['greeting'], keyboard=vk_api.menuMain)
+                else:
+                    vkData.update({str(user_id): {'step': 'login'}})
+                    vk_api.sendMessage(user_id, Data['login'], keyboard=vk_api.menuLogin)
+            else:
+                # Главное меню
+                if vkData[str(user_id)]['step'] == 'menu':
+                    if msg == 'актуальное':
+                        vk_api.sendMessage(str(user_id), Data['wip'], keyboard=vk_api.back)
+                    elif msg == 'мои задания':
+                        vk_api.sendMessage(str(user_id), Data['wip'], keyboard=vk_api.back)
+                    elif msg == 'настройки':
+                        vk_api.sendMessage(str(user_id), Data['wip'], keyboard=vk_api.back)
+                    elif msg == 'полезные материалы':
+                        vk_api.sendMessage(str(user_id), Data['wip'], keyboard=vk_api.back)
+                    else:
+                        vk_api.sendMessage(str(user_id), Data['err'], keyboard=vk_api.menuMain)
+                # Логин
+                if vkData[str(user_id)]['step'] == 'login':
+                    if msg == 'студент':
+                        vkData[str(user_id)]['step'] = 'login'
+                        vk_api.sendMessage(str(user_id), Data['student_login'])
+                    if msg == 'гость':
+                        vkData.update({str(user_id): {'isu': 'guest'}})
+                        vkData[str(user_id)]['step'] = 'menu'
+                        vk_api.sendMessage(str(user_id), Data['info'], keyboard=vk_api.menuMain)
+                    if msg.isdigit():
+                        vkData.update({str(user_id): {'isu': str(msg)}})
+                        vkData[str(user_id)]['step'] = 'menu'
+                        vk_api.sendMessage(str(user_id), Data['info'], keyboard=vk_api.menuMain)
             return 'ok'
-        except (KeyError, TypeError) as e:
-            print("(VK) Error: ", e, sys.exc_info()[0], sys.exc_info()[1])
+        except:
+            print("(VK) Error: ", sys.exc_info()[0], sys.exc_info()[1])
             return 'ok'
 
 
