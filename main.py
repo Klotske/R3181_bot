@@ -132,8 +132,56 @@ def tg_hook():
         text = update.message.text.encode("utf-8").decode()
         msg = text.lower()
         print("(TG) ID пользователя", user_id, "Сообщение: ", text)
-        if msg in ['/start', 'привет']:
-            bot.sendMessage(chat_id, "Привет")
+        if msg in ['начать', 'start', '/back', '/start']:
+            tgData.update({str(user_id): {'step': 'login'}})
+            bot.sendMessage(user_id, Data['login'], reply_markup=tg_api.menuLogin)
+        else:
+            # Логин
+            if tgData[str(user_id)]['step'] == 'login':
+                if msg == 'студент':
+                    tgData[str(user_id)]['step'] = 'login'
+                    bot.sendMessage(chat_id, Data['student_login'])
+                if msg == 'гость':
+                    tgData.update({str(user_id): {'isu': 'guest'}})
+                    tgData[str(user_id)]['step'] = 'menu'
+                    bot.sendMessage(chat_id, Data['info'], reply_markup=tg_api.menuMain)
+                if msg.isdigit():
+                    tgData.update({str(user_id): {'isu': str(msg)}})
+                    tgData[str(user_id)]['step'] = 'menu'
+                    bot.sendMessage(chat_id, Data['info'], reply_markup=tg_api.menuMain)
+            # Главное меню
+            elif tgData[str(user_id)]['step'] == 'menu':
+                if msg == 'актуальное':
+                    tgData[str(user_id)]['step'] = 'actual'
+                    bot.sendMessage(chat_id, "Актуальное", reply_markup=tg_api.back)
+                elif msg == 'мои задания':
+                    tgData[str(user_id)]['step'] = 'my_tasks'
+                    bot.sendMessage(chat_id, "Мои задания", reply_markup=tg_api.back)
+                elif msg == 'настройки':
+                    tgData[str(user_id)]['step'] = 'settings'
+                    bot.sendMessage(chat_id, "Настройки", reply_markup=tg_api.back)
+                elif msg == 'полезные материалы':
+                    tgData[str(user_id)]['step'] = 'useful_info'
+                    bot.sendMessage(chat_id, "Полезные материалы", reply_markup=tg_api.back)
+                else:
+                    bot.sendMessage(chat_id, Data['err'], reply_markup=tg_api.menuMain)
+            # Актуальное, Мои задания
+            elif tgData[str(user_id)]['step'] in ['actual', 'my_tasks']:
+                if msg == 'назад':
+                    tgData[str(user_id)]['step'] = 'menu'
+                    bot.sendMessage(chat_id, 'Главное меню', reply_markup=tg_api.menuMain)
+            # Настройки
+            elif tgData[str(user_id)]['step'] == 'settings':
+                if msg == 'назад':
+                    tgData[str(user_id)]['step'] = 'menu'
+                    bot.sendMessage(chat_id, 'Главное меню', reply_markup=tg_api.menuMain)
+            # Полезные материалы
+            elif tgData[str(user_id)]['step'] == 'useful_info':
+                if msg == 'назад':
+                    tgData[str(user_id)]['step'] = 'menu'
+                    bot.sendMessage(chat_id, 'Главное меню', reply_markup=tg_api.menuMain)
+        
+        saveTG()
         return 'ok'
     except (KeyError, TypeError) as e:
         print("(TG) Error: ", e, sys.exc_info()[0], sys.exc_info()[1])
