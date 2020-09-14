@@ -12,6 +12,15 @@ menuMain = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+menuLogin = ReplyKeyboardMarkup(
+    [
+        ["Студент"],
+        ["Гость"]
+    ],
+    one_time_keyboard=False,
+    resize_keyboard=True
+)
+
 back = ReplyKeyboardMarkup(
     [
         ["Назад"]
