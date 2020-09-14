@@ -45,6 +45,16 @@ menuMain = getKeyboard(
     }
 )
 
+menuLogin = getKeyboard(
+    {
+        "one_time": False,
+        "buttons": [
+            [getButton("Студент", "positive")],
+            [getButton("Гость", "primitive")]
+        ]
+    }
+)
+
 back = getKeyboard(
     {
         "one_time": False,
