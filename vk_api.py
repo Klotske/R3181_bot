@@ -3,7 +3,7 @@ import json, time
 import settings
 
 session = vk.Session()
-api = vk.API(session, v=5.52)
+api = vk.API(session, v=5.122)
 
 
 def sendMessage(user_id, message, keyboard="",  token=settings.token, attachment=""):

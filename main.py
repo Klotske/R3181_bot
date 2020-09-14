@@ -56,8 +56,8 @@ def vk_hook():
     data = json.loads(request.data)
     if "type" not in data.keys():
         return "non_vk"
-    elif data['type'] == "confrimation":
-        print("VK requested confrimation code")
+    elif data['type'] == "confirmation":
+        print("(VK) requested confirmation code")
         return settings.confirmationCode
     elif data['type'] == "message_new":
         user_id = data['object']['message']['from_id']
@@ -67,8 +67,10 @@ def vk_hook():
             print("(VK) ID пользователя: ", user_id, "Сообщение: ", text)
             if msg == "привет":
                 vk_api.sendMessage(user_id, "Привет!")
+            return 'ok'
         except (KeyError, TypeError) as e:
             print("(VK) Error: ", e, sys.exc_info()[0], sys.exc_info()[1])
+            return 'ok'
 
 
 @app.route('/tg/', methods=["POST"])
@@ -82,5 +84,7 @@ def tg_hook():
         print("(TG) ID пользователя", user_id, "Сообщение: ", text)
         if msg in ['/start', 'привет']:
             bot.sendMessage(chat_id, "Привет")
+        return 'ok'
     except (KeyError, TypeError) as e:
         print("(TG) Error: ", e, sys.exc_info()[0], sys.exc_info()[1])
+        return 'ok'
