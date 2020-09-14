@@ -45,6 +45,7 @@ def saveTG():
     js.dump(tgData, open(homeDir.join("tgData.json"), 'w', encoding='utf-8'),
             ensure_ascii=False, indent=4, separators=(',', ': '))
 
+loadData()
 
 @app.route('/')
 def main():
