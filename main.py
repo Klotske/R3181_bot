@@ -11,7 +11,7 @@ app = Flask(__name__)
 bot = telegram.Bot(token=settings.tg_token)
 
 # Рабочая директория
-homeDir = '/home/***/bot/'
+homeDir = '/home/klotskedev/bot/files/'
 
 # Ответы бота
 Data = {}
@@ -22,27 +22,27 @@ tgData = {}
 
 def loadData():
     global Data
-    Data = js.load(open(homeDir.join("Data.json"), 'r', encoding='utf-8'))
+    Data = js.load(open(homeDir+"Data.json", 'r', encoding='utf-8'))
 
 def loadVK():
     global vkData
-    vkData = js.load(open(homeDir.join("vkData.json"), 'r', encoding='utf-8'))
+    vkData = js.load(open(homeDir+"vkData.json", 'r', encoding='utf-8'))
     print("(VK) vkData загружена")
 
 
 def saveVK():
-    js.dump(vkData, open(homeDir.join("vkData.json"), 'w', encoding='utf-8'),
+    js.dump(vkData, open(homeDir+"vkData.json", 'w', encoding='utf-8'),
             ensure_ascii=False, indent=4, separators=(',', ': '))
 
 
 def loadTG():
     global tgData
-    tgData = js.load(open(homeDir.join("tgData.json"), 'r', encoding='utf-8'))
+    tgData = js.load(open(homeDir+"tgData.json", 'r', encoding='utf-8'))
     print("(TG) tgData загружена")
 
 
 def saveTG():
-    js.dump(tgData, open(homeDir.join("tgData.json"), 'w', encoding='utf-8'),
+    js.dump(tgData, open(homeDir+"tgData.json", 'w', encoding='utf-8'),
             ensure_ascii=False, indent=4, separators=(',', ': '))
 
 loadData()
@@ -68,25 +68,9 @@ def vk_hook():
             print("(VK) ID пользователя: ", user_id, "Сообщение: ", text)
             
             if msg in ['начать', 'start', '/back', '/start']:
-                if str(user_id) in vkData.keys():
-                    vkData[str(user_id)]['step'] = 'menu'
-                    vk_api.sendMessage(user_id, Data['greeting'], keyboard=vk_api.menuMain)
-                else:
-                    vkData.update({str(user_id): {'step': 'login'}})
-                    vk_api.sendMessage(user_id, Data['login'], keyboard=vk_api.menuLogin)
+                vkData.update({str(user_id): {'step': 'login'}})
+                vk_api.sendMessage(user_id, Data['login'], keyboard=vk_api.menuLogin)
             else:
-                # Главное меню
-                if vkData[str(user_id)]['step'] == 'menu':
-                    if msg == 'актуальное':
-                        vk_api.sendMessage(str(user_id), Data['wip'], keyboard=vk_api.back)
-                    elif msg == 'мои задания':
-                        vk_api.sendMessage(str(user_id), Data['wip'], keyboard=vk_api.back)
-                    elif msg == 'настройки':
-                        vk_api.sendMessage(str(user_id), Data['wip'], keyboard=vk_api.back)
-                    elif msg == 'полезные материалы':
-                        vk_api.sendMessage(str(user_id), Data['wip'], keyboard=vk_api.back)
-                    else:
-                        vk_api.sendMessage(str(user_id), Data['err'], keyboard=vk_api.menuMain)
                 # Логин
                 if vkData[str(user_id)]['step'] == 'login':
                     if msg == 'студент':
@@ -100,6 +84,38 @@ def vk_hook():
                         vkData.update({str(user_id): {'isu': str(msg)}})
                         vkData[str(user_id)]['step'] = 'menu'
                         vk_api.sendMessage(str(user_id), Data['info'], keyboard=vk_api.menuMain)
+                # Главное меню
+                elif vkData[str(user_id)]['step'] == 'menu':
+                    if msg == 'актуальное':
+                        vkData[str(user_id)]['step'] = 'actual'
+                        vk_api.sendMessage(str(user_id), "Актуальное", keyboard=vk_api.back)
+                    elif msg == 'мои задания':
+                        vkData[str(user_id)]['step'] = 'my_tasks'
+                        vk_api.sendMessage(str(user_id), "Мои задания", keyboard=vk_api.back)
+                    elif msg == 'настройки':
+                        vkData[str(user_id)]['step'] = 'settings'
+                        vk_api.sendMessage(str(user_id), "Настройки", keyboard=vk_api.back)
+                    elif msg == 'полезные материалы':
+                        vkData[str(user_id)]['step'] = 'useful_info'
+                        vk_api.sendMessage(str(user_id), "Полезные материалы", keyboard=vk_api.back)
+                    else:
+                        vk_api.sendMessage(str(user_id), Data['err'], keyboard=vk_api.menuMain)
+                # Актуальное, Мои задания
+                elif vkData[str(user_id)]['step'] in ['actual', 'my_tasks']:
+                    if msg == 'назад':
+                        vkData[str(user_id)]['step'] = 'menu'
+                        vk_api.sendMessage(str(user_id), 'Главное меню', keyboard=vk_api.menuMain)
+                # Настройки
+                elif vkData[str(user_id)]['step'] == 'settings':
+                    if msg == 'назад':
+                        vkData[str(user_id)]['step'] = 'menu'
+                        vk_api.sendMessage(str(user_id), 'Главное меню', keyboard=vk_api.menuMain)
+                # Полезные материалы
+                elif vkData[str(user_id)]['step'] == 'useful_info':
+                    if msg == 'назад':
+                        vkData[str(user_id)]['step'] = 'menu'
+                        vk_api.sendMessage(str(user_id), 'Главное меню', keyboard=vk_api.menuMain)
+
             saveVK()
             return 'ok'
         except:
