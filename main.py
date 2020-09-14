@@ -100,6 +100,7 @@ def vk_hook():
                         vkData.update({str(user_id): {'isu': str(msg)}})
                         vkData[str(user_id)]['step'] = 'menu'
                         vk_api.sendMessage(str(user_id), Data['info'], keyboard=vk_api.menuMain)
+            saveVK()
             return 'ok'
         except:
             print("(VK) Error: ", sys.exc_info()[0], sys.exc_info()[1])
