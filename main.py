@@ -46,6 +46,8 @@ def saveTG():
             ensure_ascii=False, indent=4, separators=(',', ': '))
 
 loadData()
+loadVK()
+loadTG()
 
 @app.route('/')
 def main():
